@@ -1,4 +1,12 @@
+import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
+import 'package:hitotsu/models/idea.dart';
+
+
+// TODO refractor the page  to have even spacing
+// TODO change state of icon chips. only active when one is selected
+// TODO indepth validation of the form
+
 
 class FormIdea extends StatefulWidget {
   FormIdea({Key key}) : super(key: key);
@@ -8,38 +16,21 @@ class FormIdea extends StatefulWidget {
 }
 
 class _FormIdeaState extends State<FormIdea> {
-  static var _valueController = TextEditingController();
-  int counter = 0;
-  List<Step> steps = [
-    Step(
-        title: Text("Idea Name"),
-        subtitle: Text("Enter name of Idea"),
-        content: formField("name", Icons.text_fields)),
-    Step(
-      title: Text("Idea Description"),
-      subtitle: Text("Enter some description of Idea"),
-      content: textArea(),
-    ),
-    Step(
-        title: Text("Category"),
-        content: Card(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20))),
-          elevation: 11,
-          child: Container(
-            margin: EdgeInsets.fromLTRB(40, 20, 40, 20),
-            child: Column(
-              children: <Widget>[
-                Text("Categories"),
-                DropdownButton(items: categories, onChanged: (value) {}),
-              ],
-            ),
-          ),
-        )),
-    Step(),
+  //set a boolean to indicate if the form is valid
+  //set state will be called on it to subit the form
+  bool isValid = true;
+  var _nameController = TextEditingController();
+  var _descriptionController = TextEditingController();
+  var _usersController = TextEditingController();
+  String _category = "android";
+  var cardElevation = 11.0;
+  var roundCorners = RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(10)));
 
-  ];
-  static List<String> languages = [
+  //set style for the action chip
+  bool clicked = true;
+
+  List<String> languages = [
     "HTML",
     "CSS",
     "PHP",
@@ -56,19 +47,22 @@ class _FormIdeaState extends State<FormIdea> {
     "REACT",
     "NODEJS"
   ];
-  
-  static List<DropdownMenuItem> categories = [
+
+  List<String> selectedLanguages = List();
+
+  List<DropdownMenuItem> categories = [
     DropdownMenuItem(value: "android", child: Text("Android Application")),
     DropdownMenuItem(value: "webapp", child: Text("Web Application")),
     DropdownMenuItem(value: "desktop", child: Text("Desktop Application")),
     DropdownMenuItem(value: "website", child: Text("Website")),
     DropdownMenuItem(value: "ios", child: Text("IOS Application")),
-    DropdownMenuItem(value: 0, child: Text("Decide Later")),
+    DropdownMenuItem(value: "none", child: Text("Decide Later")),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text("NEW IDEA"),
           centerTitle: true,
@@ -79,33 +73,68 @@ class _FormIdeaState extends State<FormIdea> {
               }),
         ),
         body: Container(
-          child: Stepper(
-            type: StepperType.vertical,
-            steps: steps,
-            currentStep: counter,
-            onStepTapped: (index) {
-              setState(() {
-                counter = index;
-              });
-            },
-            onStepContinue: () {
-              if (counter < steps.length - 1) {
-                setState(() {
-                  counter += 1;
-                });
-              }
-            },
-          ),
-        ));
+            decoration: BoxDecoration(),
+            margin: EdgeInsets.only(left: 10, right: 10),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  formField("NAME", Icons.text_fields, _nameController),
+                  Text("ENTER DESCRIPTION"),
+                  textArea(),
+                  Card(
+                    elevation: cardElevation,
+                    shape: roundCorners,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Text("CATEGORIES"),
+                        DropdownButton(
+                            value: _category,
+                            items: categories,
+                            onChanged: (value) {
+                              setState(() {
+                                _category = value;
+                              });
+                            }),
+                      ],
+                    ),
+                  ),
+                  formField("USERS", Icons.person_pin_circle, _usersController),
+                  Wrap(
+                    spacing: 7.0,
+                    alignment: WrapAlignment.start,
+                    children: getLanguages(),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      RaisedButton(
+                        color: Colors.green[600],
+                        onPressed:(){
+                          validate();
+                        },
+                        child: (Text("submit")),
+                      ),
+                      RaisedButton(
+                        color: Colors.amber[400],
+                        onPressed: () {},
+                        child: (Text("clear")),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )));
   }
 
-  static Widget formField(String hint, IconData icon) {
+  Widget formField(
+      String hint, IconData icon, TextEditingController controller) {
     return Card(
-        elevation: 11,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(40))),
+        elevation: cardElevation,
+        shape: roundCorners,
         child: TextField(
-          controller: _valueController,
+          controller: controller,
           decoration: InputDecoration(
               prefixIcon: Icon(
                 icon,
@@ -122,13 +151,12 @@ class _FormIdeaState extends State<FormIdea> {
         ));
   }
 
-  static Widget textArea() {
+  Widget textArea() {
     return Card(
-        elevation: 11,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(40))),
+        elevation: cardElevation,
+        shape: roundCorners,
         child: TextField(
-          controller: _valueController,
+          controller: _descriptionController,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.white,
@@ -138,5 +166,67 @@ class _FormIdeaState extends State<FormIdea> {
                 borderRadius: BorderRadius.all(Radius.circular(40.0))),
           ),
         ));
+  }
+
+  List<Widget> getLanguages() {
+    return languages
+        .map((language) => ActionChip(
+              label: Text(language),
+              labelStyle: clicked ? TextStyle(color: Colors.green[300]) : null,
+              onPressed: () {
+                setState(() {
+                  if (selectedLanguages.contains(language)) {
+                    selectedLanguages.remove(language);
+                  } else {
+                    selectedLanguages.add(language);
+                  }
+                  clicked = !clicked;
+                });
+                print(selectedLanguages);
+              },
+            ))
+        .toList();
+  }
+
+   validate() {
+    String name = "";
+
+    String description = _descriptionController.text;
+    String users = _usersController.text;
+    //check if there is an app name
+    if (_nameController.text.isEmpty) {
+      WordPair pair = generateWordPairs().first;
+      name += pair.asPascalCase;
+    } else {
+      name += _nameController.text;
+    }
+
+    if (description.isEmpty) {
+      setState(() {
+        isValid = false;
+      });
+    }
+
+    if (users.isEmpty) {
+      setState(() {
+        isValid = false;
+      });
+    }
+
+    if (selectedLanguages.isEmpty) {
+      setState(() {
+        isValid = false;
+      });
+    }
+
+    if (isValid) {
+      Idea idea = Idea(name, description, _category, users, selectedLanguages);
+      IdeaProvider ideaProvider = IdeaProvider();
+      ideaProvider.insertIdea(idea).then((val) {
+        Navigator.pop(context);
+      }).catchError((err) {
+        print(err);
+      });
+    }
   }
 }
