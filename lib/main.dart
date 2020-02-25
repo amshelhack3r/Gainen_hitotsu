@@ -5,6 +5,8 @@ import 'package:hitotsu/views/Home.dart';
 // TODO add firebase integration for saving ideas
 // TODO smart application architecture to save to local db when no internet or update firebase storage
 // TODO Firebase authentication to register new users
+// TODO show notifications once in a while
+// TODO share an idea to multiple social media
 
 void main() => runApp(MyApp());
 
