@@ -2,11 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hitotsu/views/insert_idea.dart';
 import 'package:hitotsu/models/idea.dart';
+import 'dart:math';
 import 'package:date_format/date_format.dart';
 
-// TODO add rounded corners to card listview
-// TODO Check for a placeholder for colors to switch each times a user taps
-// TODO change the stack widget to a description of the selected card
 // TODO change scaffold color to the color of the card
 // TODO create a page to view the ideas in depth
 // TODO use hhero image transistion to and from the page
@@ -19,8 +17,18 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Scaffold(
-      body: Home(),
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => FormIdea()));
+          },
+          child: Icon(Icons.add),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        body: Home(),
+      ),
     );
   }
 }
@@ -29,39 +37,14 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+class _HomeState extends State<Home> {
   IdeaProvider provider;
-  bool isPlaying = true;
-  Animation<dynamic> animation;
-  AnimationController controller;
-
-  List<Idea> ideasList;
-
-  showIdeas() async {
-    ideasList = await provider.getIdeas();
-  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     provider = IdeaProvider(); /**/
-
-    controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-
-    animation = Tween().animate(controller);
-    animation.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        controller.reverse();
-      } else if (status == AnimationStatus.dismissed) {
-        new Future.delayed(const Duration(seconds: 2), () {
-          if (!mounted) return;
-          controller?.forward();
-        });
-      }
-    });
-    controller.forward();
   }
 
   @override
@@ -70,16 +53,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        stack(),
-        Padding(
-          padding: EdgeInsets.only(top: 20),
-        ),
-        getIdeas()
+        _mainHeader(),
+        _bodyContent()
       ],
     );
   }
 
-  Widget stack() {
+  Widget _mainHeader() {
     final size = MediaQuery.of(context).size.width;
 
     return Stack(
@@ -107,30 +87,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ),
           ),
         ),
-        Positioned(
-            top: 30,
-            right: 0,
-            child: IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: () {},
-              color: Colors.white70,
-            )),
-        Positioned(
-            bottom: 0,
-            right: size * 0.5,
-            child: FloatingActionButton(
-                hoverElevation: 5.0,
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => FormIdea()));
-                },
-                child: AnimatedIcon(
-                    icon: AnimatedIcons.add_event, progress: controller)))
       ],
     );
   }
 
-  Widget getIdeas() {
+  Widget _bodyContent() {
     return Expanded(
       child: FutureBuilder(
           initialData: null,
@@ -156,10 +117,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                           color: Colors.blueAccent,
                           textColor: Colors.white,
                           onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) => FormIdea()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => FormIdea()));
                           },
-                          label: Text("ADD NEW", style: TextStyle(fontSize: 20),),
+                          label: Text(
+                            "ADD NEW",
+                            style: TextStyle(fontSize: 20),
+                          ),
                         ),
                       )
                     ],
@@ -171,30 +137,107 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     itemCount: snapshot.data.length,
                     itemBuilder: (context, index) {
                       Idea idea = snapshot.data[index];
+                      List<Widget> getLanguages() {
+                        return idea.languages
+                            .map((language) => ActionChip(
+
+                                  label: Text(language),
+                                  labelStyle:
+                                      TextStyle(color: Colors.green[300]),
+                                  onPressed: () {},
+                                ))
+                            .toList();
+                      }
+
                       print(idea);
                       var developed = idea.developed;
                       var period = idea.period;
                       return Container(
-                           margin: EdgeInsets.only(left: 50, top: 80, bottom: 80),
-                          child: Card(
-                            color: Colors.red,
+                        width: 300,
+                          margin:
+                              EdgeInsets.only(left: 50, top: 20, bottom: 80),
+                          child: Material(
                             elevation: 11,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Text(idea.name),
-                                Text(idea.description),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text('Developed $developed'),
-                                    Text('Period $period')
-                                  ],
-                                )
-                              ],
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            color: Colors.primaries[
+                                Random().nextInt(Colors.primaries.length)],
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  smallPadding(),
+                                  RichText(
+                                    text: TextSpan(
+                                        text: "IDEA: ",
+                                        style: TextStyle(
+                                            color: Colors.black87,
+                                            fontFamily: 'Nunito',
+                                            fontWeight: FontWeight.bold),
+                                        children: [
+                                          TextSpan(
+                                              text: idea.name,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 28,
+                                                  fontFamily: 'nunito'))
+                                        ]),
+                                  ),
+                                  smallPadding(),
+                                  Text(
+                                    "APPLICATION ABOUT BIRDS",
+                                    style: TextStyle(
+                                        fontFamily: 'nunito',
+                                        color: Colors.white70,
+                                        fontStyle: FontStyle.italic,
+                                        fontSize: 18,
+                                        decoration: TextDecoration.underline),
+                                    textWidthBasis:
+                                        TextWidthBasis.longestLine,
+                                  ),
+                                  smallPadding(),
+                                  Text(
+                                    idea.trimDescription(),
+                                    textAlign: TextAlign.justify,
+                                    softWrap: true,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontFamily: 'nunito',
+                                      color: Colors.white70,
+                                    ),
+                                  ),
+                                  smallPadding(),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Column(
+                                        children: <Widget>[
+                                          Text("TYPE"),
+                                          Text(idea.category)
+                                        ],
+                                      ),
+                                      Column(
+                                        children: <Widget>[
+                                          Text("USERS"),
+                                          Text(idea.users)
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  smallPadding(),
+                                  Wrap(
+//                                    alignment: WrapAlignment.center,
+                                    spacing: 5.0,
+                                    runAlignment: WrapAlignment.start,
+                                    runSpacing: 3,
+                                    children: getLanguages(),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                      );
+                          ));
                     });
               }
             } else if (snapshot.hasError) {
@@ -212,18 +255,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     );
   }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  _onPressed() {
-    setState(() {
-      print("helllo");
-      isPlaying = !isPlaying;
-      isPlaying ? controller.forward() : controller.reverse();
-    });
+  Widget smallPadding() {
+    return Padding(
+      padding: EdgeInsets.only(top: 20),
+    );
   }
 }
