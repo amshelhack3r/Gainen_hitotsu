@@ -7,6 +7,7 @@ import 'package:hitotsu/views/Home.dart';
 // TODO Firebase authentication to register new users
 // TODO show notifications once in a while
 // TODO share an idea to multiple social media
+import 'dart:math';
 
 void main() => runApp(MyApp());
 
@@ -21,7 +22,8 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white70,
-          fontFamily: "Nunito"
+          fontFamily: "Nunito",
+          backgroundColor: Colors.primaries[Random().nextInt(Colors.primaries.length)]
         ),
         home: HomePage()
     );
