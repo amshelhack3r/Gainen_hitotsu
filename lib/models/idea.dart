@@ -25,6 +25,9 @@ class Idea {
   String get period{
     return formatDate(_period, [dd, '/', mm, '/', yyyy]);
   }
+  String trimDescription(){
+    return (description.length > 50) ? description.substring(0, 50)+ ' ...' : description+' ...';
+  }
 
   Map<String, dynamic> toMap() {
     return {
