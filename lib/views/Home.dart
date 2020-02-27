@@ -4,6 +4,7 @@ import 'package:hitotsu/views/insert_idea.dart';
 import 'package:hitotsu/models/idea.dart';
 import 'dart:math';
 import 'package:date_format/date_format.dart';
+import 'package:hitotsu/views/insert_idea2.dart';
 
 // TODO change scaffold color to the color of the card
 // TODO create a page to view the ideas in depth
@@ -22,7 +23,7 @@ class HomePage extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => FormIdea()));
+                context, MaterialPageRoute(builder: (context) => MyStepper()));
           },
           child: Icon(Icons.add),
         ),
