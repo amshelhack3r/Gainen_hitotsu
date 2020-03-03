@@ -1,15 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hitotsu/views/insert_idea.dart';
+import 'package:hitotsu/views/Insert/formLayout.dart';
 import 'package:hitotsu/models/idea.dart';
 import 'dart:math';
-import 'package:date_format/date_format.dart';
-import 'package:hitotsu/views/insert_idea2.dart';
+import 'package:hitotsu/views/Insert/stepperLayout.dart';
 
-// TODO change scaffold color to the color of the card
-// TODO create a page to view the ideas in depth
-// TODO use hhero image transistion to and from the page
-// TODO create an edit option to update or delete an idea
 // TODO show app to people
 // TODO refractor changes people make
 // TODO upload app to the appstore
@@ -23,7 +18,7 @@ class HomePage extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => MyStepper()));
+                context, MaterialPageRoute(builder: (context) => IdeaNameForm()));
           },
           child: Icon(Icons.add),
         ),
@@ -121,7 +116,7 @@ class _HomeState extends State<Home> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => FormIdea()));
+                                    builder: (context) => IdeaNameForm()));
                           },
                           label: Text(
                             "ADD NEW",
@@ -150,7 +145,6 @@ class _HomeState extends State<Home> {
                             .toList();
                       }
 
-                      print(idea);
                       var developed = idea.developed;
                       var period = idea.period;
                       return Container(
