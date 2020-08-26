@@ -10,7 +10,7 @@ class Idea {
   List<String> importance;
   DateTime _developed;
   DateTime _period;
-  List<String> languages;
+  Set<String> languages;
   String users;
 
   Idea(this.name, this.description, this.category, this.users, this.languages) {
@@ -46,8 +46,9 @@ class Idea {
     description = map['description'];
     users = map['users'];
     category = map['category'];
-    _developed = DateTime.parse(map['developed']);
-    _period = DateTime.parse(map['period']);
+    languages = map['languages'];
+    _developed = DateTime.now();
+    _period = this._developed.add(Duration(days: 14));
   }
 
   @override
@@ -151,7 +152,7 @@ class IdeaProvider {
     for (var item in results) {
       Idea idea = Idea.fromMap(item);
       List<Map> languages = await db.query(tableLanguages, columns: [columnLanguageTitle], where: "$languageForeign = ?", whereArgs: [idea._id]);
-      idea.languages =  languages.map((language)=>language['title'].toString()).toList();
+      idea.languages =  languages.map((language)=>language['title'].toString()).toSet();
       ideas.add(idea);
     }
     return ideas;
@@ -164,7 +165,7 @@ class IdeaProvider {
     if (ideas.length > 0) {
       Idea idea = Idea.fromMap(ideas.first);
       List<Map> languages = await db.query(tableLanguages, columns: [columnLanguageTitle], where: "$languageForeign = ?", whereArgs: [id]);
-      idea.languages = languages.map((language)=> language['title']).toList();
+      idea.languages = languages.map((language)=> language['title']).toSet();
       return idea;
     }
     return null;

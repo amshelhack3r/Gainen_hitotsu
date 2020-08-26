@@ -1,5 +1,5 @@
 // TODO create a page to view the ideas in depth
-// TODO use hhero image transistion to and from the page
+// TODO use hero image transistion to and from the page
 // TODO create an edit option to update or delete an idea
 
 import 'package:flutter/material.dart';

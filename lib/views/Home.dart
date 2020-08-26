@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hitotsu/views/Insert/formLayout.dart';
 import 'package:hitotsu/models/idea.dart';
 import 'dart:math';
 import 'package:hitotsu/views/Insert/stepperLayout.dart';
@@ -8,6 +7,7 @@ import 'package:hitotsu/views/Insert/stepperLayout.dart';
 // TODO show app to people
 // TODO refractor changes people make
 // TODO upload app to the appstore
+// TODO overhaul of systemUI for multiple screen sizes. (media query stuff)
 
 class HomePage extends StatelessWidget {
   @override
@@ -17,8 +17,7 @@ class HomePage extends StatelessWidget {
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => IdeaNameForm()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => IdeaNameForm()));
           },
           child: Icon(Icons.add),
         ),
@@ -48,10 +47,7 @@ class _HomeState extends State<Home> {
     // TODO: implement build
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        _mainHeader(),
-        _bodyContent()
-      ],
+      children: <Widget>[_mainHeader(), _bodyContent()],
     );
   }
 
@@ -65,18 +61,13 @@ class _HomeState extends State<Home> {
           width: size,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(50.0),
-                  bottomRight: Radius.circular(50.0)),
+                  bottomLeft: Radius.circular(50.0), bottomRight: Radius.circular(50.0)),
               boxShadow: [
-                BoxShadow(
-                    color: Colors.black54,
-                    offset: Offset(0.0, 2.0),
-                    blurRadius: 6.0)
+                BoxShadow(color: Colors.black54, offset: Offset(0.0, 2.0), blurRadius: 6.0)
               ]),
           child: ClipRRect(
             borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(50.0),
-                bottomRight: Radius.circular(50.0)),
+                bottomLeft: Radius.circular(50.0), bottomRight: Radius.circular(50.0)),
             child: Image.asset(
               'data_repo/images/overview.jpg',
               fit: BoxFit.cover,
@@ -114,9 +105,7 @@ class _HomeState extends State<Home> {
                           textColor: Colors.white,
                           onPressed: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => IdeaNameForm()));
+                                context, MaterialPageRoute(builder: (context) => IdeaNameForm()));
                           },
                           label: Text(
                             "ADD NEW",
@@ -136,27 +125,20 @@ class _HomeState extends State<Home> {
                       List<Widget> getLanguages() {
                         return idea.languages
                             .map((language) => ActionChip(
-
                                   label: Text(language),
-                                  labelStyle:
-                                      TextStyle(color: Colors.green[300]),
+                                  labelStyle: TextStyle(color: Colors.green[300]),
                                   onPressed: () {},
                                 ))
                             .toList();
                       }
 
-                      var developed = idea.developed;
-                      var period = idea.period;
                       return Container(
-                        width: 300,
-                          margin:
-                              EdgeInsets.only(left: 50, top: 20, bottom: 80),
+                          width: 300,
+                          margin: EdgeInsets.only(left: 50, top: 20, bottom: 80),
                           child: Material(
                             elevation: 11,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                            color: Colors.primaries[
-                                Random().nextInt(Colors.primaries.length)],
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            color: Colors.primaries[Random().nextInt(Colors.primaries.length)],
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: Column(
@@ -188,8 +170,7 @@ class _HomeState extends State<Home> {
                                         fontStyle: FontStyle.italic,
                                         fontSize: 18,
                                         decoration: TextDecoration.underline),
-                                    textWidthBasis:
-                                        TextWidthBasis.longestLine,
+                                    textWidthBasis: TextWidthBasis.longestLine,
                                   ),
                                   smallPadding(),
                                   Text(
@@ -204,20 +185,13 @@ class _HomeState extends State<Home> {
                                   ),
                                   smallPadding(),
                                   Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: <Widget>[
                                       Column(
-                                        children: <Widget>[
-                                          Text("TYPE"),
-                                          Text(idea.category)
-                                        ],
+                                        children: <Widget>[Text("TYPE"), Text(idea.category)],
                                       ),
                                       Column(
-                                        children: <Widget>[
-                                          Text("USERS"),
-                                          Text(idea.users)
-                                        ],
+                                        children: <Widget>[Text("USERS"), Text(idea.users)],
                                       )
                                     ],
                                   ),

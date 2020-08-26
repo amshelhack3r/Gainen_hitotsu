@@ -1,25 +1,38 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hitotsu/models/idea.dart';
+import 'package:hitotsu/utils/IdeaState.dart';
 import 'package:hitotsu/utils/utils.dart';
+import 'package:provider/provider.dart';
 
-//TODO add provider to share state between screens
+import '../Home.dart';
+
+//TODO add validation to so as not to commit unless form is filled
+//TODO go step further by implementing validation using the bloc pattern with transformers
+//TODO Create final screen for reviewing the form and asking the user to commit changes
 //TODO add notification manager to set notification for a project
-//TODO add more languages
-//TODO Save to DB
 
 class IdeaNameForm extends StatelessWidget {
-  TextEditingController nameController, aboutController;
-  String namePlaceholder, aboutPlaceHolder;
+  TextEditingController nameController = new TextEditingController();
+  TextEditingController aboutController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    Map ideaMap = Provider.of<IdeaState>(context).formState;
+    print(ideaMap);
+    if (ideaMap.containsKey("name")) {
+      nameController.text = ideaMap['name'];
+    }
+
+    if (ideaMap.containsKey("about")) {
+      aboutController.text = ideaMap['about'];
+    }
     // TODO: implement build
     return SafeArea(
       child: Scaffold(
         body: Container(
-            margin: EdgeInsets.all(20),
+            margin: EdgeInsets.all(10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -27,42 +40,59 @@ class IdeaNameForm extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
 //          crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    RichText(
-                      textAlign: TextAlign.left,
-                      text: TextSpan(
-                          text: "IDEA NAME: ",
-                          style: labels(),
-                          children: [
-                            TextSpan(
-                                text: namePlaceholder, style: namingHeaders())
-                          ]),
-                    ),
+                    Consumer<IdeaState>(
+                        builder: (BuildContext context, IdeaState state,
+                                Widget child) =>
+                            RichText(
+                              textAlign: TextAlign.left,
+                              text: TextSpan(
+                                  text: "IDEA NAME: ",
+                                  style: labels(),
+                                  children: [
+                                    TextSpan(
+                                        text: ideaMap.containsKey("name")
+                                            ? ideaMap['name']
+                                            : state.ideaName,
+                                        style: namingHeaders())
+                                  ]),
+                            )),
                     Padding(
                       padding: EdgeInsets.all(20),
                     ),
-                    RichText(
-                      textAlign: TextAlign.left,
-                      text:
-                          TextSpan(text: "ABOUT: ", style: labels(), children: [
-                        TextSpan(text: aboutPlaceHolder, style: namingHeaders())
-                      ]),
-                    ),
+                    Consumer<IdeaState>(
+                        builder: (_, state, child) => RichText(
+                              textAlign: TextAlign.left,
+                              text: TextSpan(
+                                  text: "ABOUT: ",
+                                  style: labels(),
+                                  children: [
+                                    TextSpan(
+                                        text: ideaMap.containsKey("about")
+                                            ? ideaMap['about']
+                                            : state.ideaAbout,
+                                        style: namingHeaders())
+                                  ]),
+                            )),
                   ],
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     TextField(
-                      controller: nameController,
-                      onChanged: (val) {},
+                      onChanged: (val) {
+                        Provider.of<IdeaState>(context, listen: false)
+                            .ideaName = val;
+                      },
                       decoration: textFields(Icons.assignment, "CHANGE NAME"),
                     ),
                     Padding(
                       padding: EdgeInsets.all(20),
                     ),
                     TextField(
-                      onChanged: (val) {},
-                      controller: aboutController,
+                      onChanged: (val) {
+                        Provider.of<IdeaState>(context, listen: false)
+                            .ideaAbout = val;
+                      },
                       decoration: textFields(Icons.description, "CHANGE ABOUT"),
                     ),
                   ],
@@ -79,6 +109,17 @@ class IdeaNameForm extends StatelessWidget {
                         child: IconButton(
                           color: Colors.white70,
                           onPressed: () {
+                            var name =
+                                Provider.of<IdeaState>(context, listen: false)
+                                    .ideaName;
+                            var about =
+                                Provider.of<IdeaState>(context, listen: false)
+                                    .ideaAbout;
+
+                            Provider.of<IdeaState>(context, listen: false)
+                                .mapIdea("name", name);
+                            Provider.of<IdeaState>(context, listen: false)
+                                .mapIdea("about", about);
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -120,10 +161,15 @@ class IdeaNameForm extends StatelessWidget {
 }
 
 class IdeaDescriptionForm extends StatelessWidget {
-  TextEditingController descriptionController;
+  TextEditingController descriptionController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> ideaMap = Provider.of<IdeaState>(context).formState;
+    print(ideaMap);
+    if (ideaMap.containsKey("description")) {
+      descriptionController.text = ideaMap['description'];
+    }
     // TODO: implement build
     return SafeArea(
       child: Scaffold(
@@ -138,6 +184,10 @@ class IdeaDescriptionForm extends StatelessWidget {
                 ),
                 Expanded(
                   child: TextField(
+                    onChanged: (val) {
+                      Provider.of<IdeaState>(context, listen: false)
+                          .description = val;
+                    },
                     decoration: InputDecoration(
                         hintText: "Some Description",
                         hintStyle: TextStyle(
@@ -161,6 +211,9 @@ class IdeaDescriptionForm extends StatelessWidget {
                         child: IconButton(
                           color: Colors.white70,
                           onPressed: () {
+                            ideaMap['description'] =
+                                Provider.of<IdeaState>(context, listen: false)
+                                    .description;
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -201,27 +254,7 @@ class IdeaDescriptionForm extends StatelessWidget {
 }
 
 class IdeaMiscForm extends StatelessWidget {
-  List<String> languages = [
-    "HTML",
-    "CSS",
-    "PHP",
-    "JAVASCRIPT",
-    "PYTHON",
-    "RUBY",
-    "JAVA",
-    "KOTLIN",
-    "FLUTTER",
-    "DART",
-    "MYSQL",
-    "FIREBASE",
-    "MONGODB",
-    "REACT",
-    "NODEJS"
-  ];
-  String _category = "android";
-
-  List<String> selectedLanguages = [];
-
+  List<String> languages = getLanguagesStack();
   List<DropdownMenuItem> categories = [
     DropdownMenuItem(value: "android", child: Text("Android Application")),
     DropdownMenuItem(value: "webapp", child: Text("Web Application")),
@@ -233,13 +266,15 @@ class IdeaMiscForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> ideaMap = Provider.of<IdeaState>(context).formState;
+    print(ideaMap);
+
     // TODO: implement build
     return SafeArea(
       child: Scaffold(
         body: Container(
             margin: EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+            child: ListView(
               children: <Widget>[
                 Column(
                   children: <Widget>[
@@ -247,17 +282,29 @@ class IdeaMiscForm extends StatelessWidget {
                       "CATEGORIES",
                       style: namingHeaders(),
                     ),
-                    DropdownButton(
-                        value: _category,
-                        items: categories,
-                        onChanged: (value) {}),
+                    Consumer<IdeaState>(
+                      builder: (_, state, child) => DropdownButton(
+                          value: state.category,
+                          items: categories,
+                          onChanged: (value) {
+                            Provider.of<IdeaState>(context, listen: false).category = value;
+                          }),
+                    )
                   ],
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 50),
                 ),
+                Text(
+                  "USERS INVOLVED",
+                  style: namingHeaders(),
+                ),
                 TextField(
                     keyboardType: TextInputType.number,
+                    onChanged: (val) {
+                      Provider.of<IdeaState>(context, listen: false).users = val;
+                      print(Provider.of<IdeaState>(context, listen: false).formState);
+                    },
                     decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.person,
@@ -275,19 +322,22 @@ class IdeaMiscForm extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.only(top: 50),
                 ),
-                Wrap(
-                  spacing: 3.0,
-                  children: buildChips(),
-                ),
+                Consumer<IdeaState>(
+                    builder: (_, state, child) => Wrap(
+                          spacing: 3.0,
+                          children: buildChips(state.selectedLanguages, context),
+                        )),
                 Padding(
                   padding: EdgeInsets.only(top: 50),
                 ),
-                Expanded(
-                  child: Wrap(
-                    spacing: 7.0,
-                    alignment: WrapAlignment.start,
-                    children: getLanguages(),
-                  ),
+                Text(
+                  "LANGUAGES",
+                  style: namingHeaders(),
+                ),
+                Wrap(
+                  spacing: 7.0,
+                  alignment: WrapAlignment.start,
+                  children: getLanguages(context),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -299,7 +349,23 @@ class IdeaMiscForm extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40)),
                         onPressed: () {
-                          print("yes");
+                          ideaMap['category'] =
+                              Provider.of<IdeaState>(context, listen: false)
+                                  .category;
+                          ideaMap['users'] =
+                              Provider.of<IdeaState>(context, listen: false)
+                                  .users;
+                          ideaMap['languages'] =
+                              Provider.of<IdeaState>(context, listen: false)
+                                  .selectedLanguages;
+
+                          Provider.of<IdeaState>(context, listen: false)
+                              .formState = ideaMap;
+
+                          var provider = IdeaProvider();
+                          provider.insertIdea(Idea.fromMap(ideaMap)).then((val){
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage()));
+                          });
                         },
                         color: Colors.blueAccent,
                         icon: Icon(
@@ -339,19 +405,20 @@ class IdeaMiscForm extends StatelessWidget {
     );
   }
 
-  List<Widget> getLanguages() {
+  List<Widget> getLanguages(BuildContext context) {
     return languages
         .map((language) => ActionChip(
               elevation: 11,
               onPressed: () {
-                if (!selectedLanguages.contains(language)) {}
+                Provider.of<IdeaState>(context, listen: false).language =
+                    language;
               },
               label: Text(language),
             ))
         .toList();
   }
 
-  List<Widget> buildChips() {
+  List<Widget> buildChips(Set<String> selectedLanguages, BuildContext context) {
     return selectedLanguages
         .map((language) => Chip(
               label: Text(language),
@@ -359,7 +426,9 @@ class IdeaMiscForm extends StatelessWidget {
               labelStyle: TextStyle(color: Colors.white70),
               deleteIcon: Icon(Icons.cancel),
               deleteIconColor: Colors.redAccent,
-              onDeleted: () {},
+              onDeleted: () {
+                Provider.of<IdeaState>(context, listen: false).removeLanguage(language);
+              },
             ))
         .toList();
   }

@@ -1,5 +1,62 @@
 import 'package:flutter/material.dart';
 
+List<String> getLanguagesStack() {
+  var langStack = [
+    "HTML",
+    "CSS",
+    "PHP",
+    "JAVASCRIPT",
+    "PYTHON",
+    "RUBY",
+    "JAVA",
+    "KOTLIN",
+    "FLUTTER",
+    "DART",
+    "MYSQL",
+    "FIREBASE",
+    "MONGODB",
+    "REACT",
+    "NODEJS",
+    "BOOTSTRAP 4",
+    "BOOTSTRAP 3",
+    "BOOTSTRAP 3",
+    "FONT AWESOME",
+    "HANDLEBARS",
+    "LARAVEL",
+    "LUMEN",
+    "FLASK",
+    "DJANGO",
+    "EXPRESS",
+    "NGINX",
+    "APACHE",
+    "SQLITE",
+    "UNDERSCORE JS",
+    "MOMENT JS",
+    "JQUERY",
+    "ANGULAR",
+    "C",
+    "C++",
+    "DOCKER",
+    "KUBERNETES",
+    "ELIXIR",
+    "ERLANG",
+    "EMBER JS",
+    "JEKYLL",
+    "JOOMLA",
+    "JINJA",
+    "NET FRAMEWORK",
+    "PostgreSQL",
+    "SWIFT",
+    "OBJECTIVE C",
+    "SPRING FRAMEWORK",
+    "TYPESCRIPT",
+    "UNITY",
+    "VUE JS",
+  ];
+  langStack.sort();
+  return langStack;
+}
+
 LinearGradient getCustomGradient() {
   // Define a Linear Gradient
   return new LinearGradient(
@@ -26,6 +83,7 @@ TextStyle getCustomFontTextStyle() {
 //styling
 TextStyle namingHeaders() {
   return TextStyle(
+
       color: Colors.blueAccent,
       fontFamily: "Nunito",
       fontWeight: FontWeight.bold,
